@@ -1,3 +1,5 @@
+import { SCORE } from './config.js';
+
 const KEYS = {
   total: 'ws_totalStars',
   bestBeginner: 'ws_best_beginner',
@@ -46,7 +48,10 @@ export function saveGameResult({ level, elapsedSeconds, score, stars }) {
 }
 
 export function calcWordScore(wordLength, secondsSinceLastFind) {
-  const base = wordLength * 10;
-  const multiplier = secondsSinceLastFind <= 10 ? 2.0 : secondsSinceLastFind <= 20 ? 1.5 : 1.0;
-  return Math.round((base * multiplier) / 5) * 5;
+  const base = wordLength * SCORE.base;
+  const multiplier =
+    secondsSinceLastFind <= SCORE.fastTier ? SCORE.fastMul :
+    secondsSinceLastFind <= SCORE.midTier  ? SCORE.midMul  :
+                                             SCORE.slowMul;
+  return Math.round((base * multiplier) / SCORE.roundTo) * SCORE.roundTo;
 }

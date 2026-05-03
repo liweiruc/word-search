@@ -1,12 +1,8 @@
 import beginner from './data/beginner.json';
 import advanced from './data/advanced.json';
+import { LEVELS } from './config.js';
 
 const LIBRARIES = { beginner, advanced };
-
-const CONFIG = {
-  beginner: { gridSize: 7, wordCount: 7 },
-  advanced: { gridSize: 12, wordCount: 8 },
-};
 
 const DIRECTIONS = [
   [0, 1],
@@ -21,13 +17,21 @@ const DIRECTIONS = [
 
 export function startNewGame(level) {
   const library = LIBRARIES[level];
-  const { gridSize, wordCount } = CONFIG[level];
+  const { gridSize, wordCount } = LEVELS[level];
   const themes = Object.keys(library);
   const theme = themes[Math.floor(Math.random() * themes.length)];
   const pool = library[theme].filter((w) => w.length <= gridSize);
   const words = pickRandom(pool, wordCount);
-  const { letters, placed } = generatePuzzle(words, gridSize);
-  return { theme, letters, words: placed };
+
+  let best = null;
+  for (let i = 0; i < 10; i++) {
+    const result = generatePuzzle(words, gridSize);
+    if (result.placed.length === words.length) {
+      return { theme, letters: result.letters, words: result.placed };
+    }
+    if (!best || result.placed.length > best.placed.length) best = result;
+  }
+  return { theme, letters: best.letters, words: best.placed };
 }
 
 function pickRandom(arr, n) {
@@ -45,9 +49,10 @@ function generatePuzzle(words, size) {
   const grid = Array.from({ length: size }, () => Array(size).fill(null));
   const placed = [];
   const sorted = [...words].sort((a, b) => b.length - a.length);
+  const groupOrder = [...DIR_GROUPS].sort(() => Math.random() - 0.5);
   let groupIdx = 0;
   for (const word of sorted) {
-    const dirs = DIR_GROUPS[groupIdx % DIR_GROUPS.length];
+    const dirs = groupOrder[groupIdx % groupOrder.length];
     groupIdx++;
     if (tryPlace(grid, word, size, dirs)) placed.push(word);
   }

@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Word Search" />
+    <meta name="description" content="A touch-friendly word search puzzle game by Vic Lee" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/icon.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
@@ -44,10 +45,9 @@
             <polygon points="14.5,11 14.5,25 26,18" fill="rgba(255,255,255,0.95)"/>
           </svg>
         </button>
-        <span class="theme-display" id="themeDisplay">Word Search</span>
         <span class="timer-display" id="timerDisplay">0:00</span>
         <span class="score-display" id="scoreDisplay">⭐ 0</span>
-        <button class="icon-btn" id="newGame" aria-label="New Game" style="font-size: 32px;">🔄</button>
+        <button class="icon-btn" id="newGame" aria-label="New Game">🔄</button>
         <button class="icon-btn" id="statsBtn" aria-label="Stats">
           <svg viewBox="0 0 24 24" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -69,6 +69,7 @@
           </svg>
         </button>
       </div>
+      <h1 class="theme-display" id="themeDisplay">Word Search</h1>
       <aside class="word-list-panel">
         <ul id="words"></ul>
       </aside>

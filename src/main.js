@@ -1,6 +1,7 @@
 import { startNewGame } from './logic.js';
 import { renderGrid, renderWordList, setFound, markFoundCells, showCongrats, showStats } from './view.js';
 import { loadStats, saveGameResult, calcWordScore } from './scores.js';
+import { LEVELS } from './config.js';
 
 let currentLevel = 'beginner';
 let paused = false;
@@ -55,9 +56,12 @@ function togglePause() {
   gridEl.classList.toggle('paused', paused);
   if (paused) {
     state.elapsedAtPause += (Date.now() - state.startTime) / 1000;
+    state.pauseStart = Date.now();
     clearInterval(state.timerInterval);
     state.timerInterval = null;
   } else {
+    const pauseMs = Date.now() - state.pauseStart;
+    state.lastFindTime += pauseMs;
     state.startTime = Date.now();
     state.timerInterval = setInterval(() => {
       timerEl.textContent = formatTime(state.elapsedAtPause + (Date.now() - state.startTime) / 1000);
@@ -66,8 +70,7 @@ function togglePause() {
 }
 
 function computeStars(level, secs) {
-  const benchmarks = { beginner: [60, 120], advanced: [120, 240] };
-  const [gold, silver] = benchmarks[level] ?? benchmarks.advanced;
+  const { gold, silver } = LEVELS[level] ?? LEVELS.advanced;
   return secs <= gold ? 3 : secs <= silver ? 2 : 1;
 }
 
@@ -88,7 +91,6 @@ function newGame(level) {
 }
 
 function onWordFound(word, color) {
-  if (state.found.includes(word)) return;
   state.found.push(word);
 
   const secondsSinceLast = (Date.now() - state.lastFindTime) / 1000;
@@ -114,11 +116,11 @@ function onWordFound(word, color) {
 gridEl.addEventListener('cellselect', (e) => {
   const { word, cells } = e.detail;
   const rev = word.split('').reverse().join('');
-  if (word && (state.words.includes(word) || state.words.includes(rev))) {
-    const match = state.words.includes(word) ? word : rev;
-    const color = markFoundCells(cells);
-    onWordFound(match, color);
-  }
+  if (!word) return;
+  const match = state.words.includes(word) ? word : state.words.includes(rev) ? rev : null;
+  if (!match || state.found.includes(match)) return;
+  const color = markFoundCells(cells);
+  onWordFound(match, color);
 });
 
 levelBtns.forEach((btn) => {

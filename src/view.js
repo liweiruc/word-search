@@ -1,19 +1,10 @@
+import { FOUND_COLORS, CONFETTI_COLORS, STATS_CARD_BGS } from './constants.js';
+
 let selecting = false;
 let firstCell = null;
 let lineCells = [];
 let foundColorIdx = 0;
 let activeGrid = null;
-
-const FOUND_COLORS = [
-  { cell: '#ff5252', text: '#ffffff' },  // red
-  { cell: '#ff9100', text: '#ffffff' },  // orange
-  { cell: '#ffd600', text: '#3e2723' },  // yellow
-  { cell: '#00c853', text: '#ffffff' },  // green
-  { cell: '#00b8d4', text: '#ffffff' },  // cyan
-  { cell: '#2979f3', text: '#ffffff' },  // blue
-  { cell: '#651fff', text: '#ffffff' },  // purple
-  { cell: '#f50057', text: '#ffffff' },  // magenta
-];
 
 function getCellEls(grid) {
   return Array.from(grid.querySelectorAll('.cell'));
@@ -41,21 +32,14 @@ export function renderGrid(container, letters) {
 }
 
 export function renderWordList(container, words) {
-  const makeItem = (word) => {
+  const items = words.map((word) => {
     const li = document.createElement('li');
     li.className = 'word';
     li.textContent = word;
     li.dataset.word = word;
     return li;
-  };
-  const half = Math.ceil(words.length / 2);
-  const flexBreak = document.createElement('li');
-  flexBreak.style.cssText = 'width:100%;height:0;padding:0;margin:0;background:none;list-style:none;';
-  container.replaceChildren(
-    ...words.slice(0, half).map(makeItem),
-    flexBreak,
-    ...words.slice(half).map(makeItem),
-  );
+  });
+  container.replaceChildren(...items);
 }
 
 const KID_EMOJIS = ['⭐', '🌟', '✨', '🎉'];
@@ -98,13 +82,7 @@ function clearLine() {
   const targets = activeGrid
     ? activeGrid.querySelectorAll('.cell.selected')
     : lineCells;
-  targets.forEach((c) => {
-    c.classList.remove('selected');
-    if (!c.classList.contains('found-word')) {
-      c.style.background = '';
-      c.style.color = '';
-    }
-  });
+  targets.forEach((c) => c.classList.remove('selected'));
   lineCells = [];
 }
 
@@ -182,14 +160,7 @@ function cellFromPoint(x, y) {
 }
 
 function highlightSelection(cells) {
-  const col = FOUND_COLORS[foundColorIdx % FOUND_COLORS.length];
-  cells.forEach((c) => {
-    c.classList.add('selected');
-    if (!c.classList.contains('found-word')) {
-      c.style.background = col.cell;
-      c.style.color = col.text;
-    }
-  });
+  cells.forEach((c) => c.classList.add('selected'));
 }
 
 function onMove(e) {
@@ -234,12 +205,12 @@ export function showStats(stats) {
   const { totalStars, gamesPlayed, bestTime, bestStreak, currentStreak } = stats;
 
   const cards = [
-    { icon: '🎮', label: 'Games Played',   value: gamesPlayed,                              color: '#eaefff' },
-    { icon: '⭐', label: 'Total Stars',    value: totalStars,                               color: '#fef9c3' },
-    { icon: '🏆', label: 'Best · Beginner', value: fmtTime(bestTime.beginner),             color: '#dcfce7' },
-    { icon: '🏆', label: 'Best · Advanced', value: fmtTime(bestTime.advanced),             color: '#f3e8ff' },
-    { icon: '🔥', label: 'Best Streak',    value: bestStreak ? `${bestStreak}×` : '—',     color: '#ffedd5' },
-    { icon: '⚡', label: 'Current Streak', value: currentStreak ? `${currentStreak}×` : '—', color: '#fce7f3' },
+    { icon: '🎮', label: 'Games Played',   value: gamesPlayed,                              color: STATS_CARD_BGS[0] },
+    { icon: '⭐', label: 'Total Stars',    value: totalStars,                               color: STATS_CARD_BGS[1] },
+    { icon: '🏆', label: 'Best · Beginner', value: fmtTime(bestTime.beginner),             color: STATS_CARD_BGS[2] },
+    { icon: '🏆', label: 'Best · Advanced', value: fmtTime(bestTime.advanced),             color: STATS_CARD_BGS[3] },
+    { icon: '🔥', label: 'Best Streak',    value: bestStreak ? `${bestStreak}×` : '—',     color: STATS_CARD_BGS[4] },
+    { icon: '⚡', label: 'Current Streak', value: currentStreak ? `${currentStreak}×` : '—', color: STATS_CARD_BGS[5] },
   ];
 
   const overlay = document.createElement('div');
@@ -262,25 +233,17 @@ export function showStats(stats) {
     </div>
   `;
 
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
   const close = () => {
+    document.removeEventListener('keydown', onKey);
     overlay.classList.add('leaving');
     overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
   };
   overlay.querySelector('.stats-close').addEventListener('click', close);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', onKey);
   document.body.appendChild(overlay);
-}
-
-function computeStars(level, secs) {
-  const benchmarks = { beginner: [60, 120], advanced: [120, 240] };
-  const [gold, silver] = benchmarks[level] ?? benchmarks.advanced;
-  return secs <= gold ? 3 : secs <= silver ? 2 : 1;
-}
-
-function formatTimeSub(secs) {
-  const m = Math.floor(secs / 60);
-  const s = Math.floor(secs % 60);
-  return `${m}:${String(s).padStart(2, '0')}`;
+  overlay.querySelector('.stats-close').focus();
 }
 
 export function showCongrats(onClose, { level = 'beginner', elapsedSeconds = 0, score = 0, stars = 1, savedStats = {} } = {}) {
@@ -293,13 +256,12 @@ export function showCongrats(onClose, { level = 'beginner', elapsedSeconds = 0, 
   const overlay = document.createElement('div');
   overlay.className = 'celebrate-overlay';
 
-  const colors = ['#4a6cf7', '#7a5cf7', '#f7c54a', '#f74a8b', '#4af7a3', '#f78e4a', '#5ad6f7'];
   const confettiCount = isKid ? 100 : 40;
   for (let i = 0; i < confettiCount; i++) {
     const piece = document.createElement('div');
     piece.className = 'confetti';
     piece.style.left = Math.random() * 100 + 'vw';
-    piece.style.background = colors[i % colors.length];
+    piece.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
     piece.style.width = 6 + Math.random() * 8 + 'px';
     piece.style.height = 10 + Math.random() * 8 + 'px';
     piece.style.animationDuration = (isKid ? 2 : 3) + Math.random() * 2 + 's';
@@ -323,7 +285,7 @@ export function showCongrats(onClose, { level = 'beginner', elapsedSeconds = 0, 
     <div class="celebrate-thumb" aria-hidden="true">${isKid ? '🎉' : '👏'}</div>
     <h2 class="celebrate-title">${isKid ? 'Amazing!' : 'Well done.'}</h2>
     <div class="celebrate-stars">${starsHtml}</div>
-    <p class="celebrate-sub">${isKid ? 'You found all the words!' : `Completed in ${formatTimeSub(elapsedSeconds)}`}</p>
+    <p class="celebrate-sub">${isKid ? 'You found all the words!' : `Completed in ${fmtTime(elapsedSeconds)}`}</p>
     <div class="reward-score">
       <span class="reward-score-game">⭐ ${score}</span>
       <span class="reward-score-total">Total ⭐ ${totalStars} · ${gamesPlayed} games</span>
@@ -333,7 +295,9 @@ export function showCongrats(onClose, { level = 'beginner', elapsedSeconds = 0, 
   `;
   overlay.appendChild(card);
 
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
   const close = () => {
+    document.removeEventListener('keydown', onKey);
     overlay.classList.add('leaving');
     overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
     if (onClose) onClose();
@@ -342,8 +306,10 @@ export function showCongrats(onClose, { level = 'beginner', elapsedSeconds = 0, 
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) close();
   });
+  document.addEventListener('keydown', onKey);
 
   document.body.appendChild(overlay);
+  card.querySelector('.celebrate-btn').focus();
 }
 
 function onEnd() {
