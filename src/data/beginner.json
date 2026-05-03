@@ -1,0 +1,72 @@
+{
+  "Animals": [
+    "CAT", "DOG", "COW", "PIG", "HEN", "FOX", "OWL", "BEE", "BAT", "RAT",
+    "ANT", "FLY", "EMU", "ELK", "YAK", "BIRD", "FISH", "DUCK", "GOAT", "LION",
+    "BEAR", "FROG", "WOLF", "DEER", "SEAL", "SWAN", "CRAB", "WORM", "MOLE", "MULE",
+    "TOAD", "MOTH", "WASP", "PONY", "LAMB", "DOVE", "CUB", "PUP", "HORSE", "SHEEP",
+    "GOOSE", "ZEBRA", "TIGER", "PANDA", "KOALA", "CAMEL", "SHARK", "WHALE", "SNAKE", "EAGLE",
+    "PUPPY", "CHICK", "BUNNY", "MOUSE", "SNAIL", "SKUNK", "SLOTH", "MOOSE", "OTTER", "ROBIN",
+    "RAVEN", "STORK", "HAWK", "KITTY", "RABBIT", "MONKEY", "TURTLE", "PARROT", "KITTEN", "DONKEY",
+    "BEETLE", "SPIDER", "LIZARD", "FALCON", "PIGEON", "TURKEY", "SHRIMP", "PIGLET", "POODLE", "HAMSTER"
+  ],
+  "Food & Drink": [
+    "APPLE", "BREAD", "MILK", "RICE", "CAKE", "MEAT", "CHEESE", "BUTTER", "JAM", "HONEY",
+    "JUICE", "WATER", "TEA", "SOUP", "SALAD", "PIZZA", "PASTA", "NOODLE", "BANANA", "ORANGE",
+    "GRAPE", "LEMON", "MANGO", "PEACH", "PEAR", "PLUM", "BERRY", "MELON", "CHERRY", "KIWI",
+    "CARROT", "POTATO", "TOMATO", "ONION", "BEAN", "CORN", "PEAS", "CANDY", "COOKIE", "DONUT",
+    "MUFFIN", "WAFFLE", "CHIPS", "COCOA", "COFFEE", "SODA", "NUTS", "SUGAR", "SALT", "FLOUR",
+    "OLIVE", "PUMPKIN", "GINGER", "LETTUCE", "CABBAGE", "SPINACH", "TURNIP", "RADISH", "GARLIC", "CHICKEN"
+  ],
+  "Body & Family": [
+    "HEAD", "FACE", "EYE", "EAR", "NOSE", "MOUTH", "LIP", "TOOTH", "NECK", "ARM",
+    "HAND", "FINGER", "THUMB", "NAIL", "LEG", "FOOT", "TOE", "KNEE", "HEEL", "HAIR",
+    "CHEEK", "CHIN", "BACK", "HIP", "BELLY", "CHEST", "SKIN", "BONE", "HEART", "ELBOW",
+    "MOM", "DAD", "SISTER", "BROTHER", "BABY", "SON", "GIRL", "BOY", "AUNT", "UNCLE",
+    "COUSIN", "GRANNY", "GRANDPA", "GRANDMA", "FAMILY", "TWIN", "FRIEND", "MAMA", "PAPA", "KID"
+  ],
+  "Colors & Shapes": [
+    "RED", "BLUE", "GREEN", "YELLOW", "ORANGE", "PINK", "BLACK", "WHITE", "BROWN", "PURPLE",
+    "GRAY", "GOLD", "SILVER", "CREAM", "BEIGE", "CIRCLE", "SQUARE", "OVAL", "STAR", "HEART",
+    "DIAMOND", "BOX", "CONE", "CUBE", "RING", "ARROW", "CROSS", "DOT", "LINE", "LOOP"
+  ],
+  "Clothes": [
+    "HAT", "CAP", "COAT", "SHIRT", "SOCK", "SHOE", "BOOT", "GLOVE", "SCARF", "BELT",
+    "SKIRT", "DRESS", "JEANS", "PANTS", "JACKET", "JUMPER", "SHORTS", "TIE", "ROBE", "VEST",
+    "HOOD", "GOWN", "MITTEN", "SANDAL", "RIBBON", "BUTTON", "ZIPPER", "POCKET", "SUIT", "CROWN"
+  ],
+  "Nature & Weather": [
+    "SUN", "MOON", "STAR", "CLOUD", "RAIN", "SNOW", "WIND", "STORM", "FOG", "MIST",
+    "ICE", "SKY", "SEA", "OCEAN", "RIVER", "LAKE", "POND", "BEACH", "SAND", "ROCK",
+    "STONE", "HILL", "TREE", "LEAF", "FLOWER", "GRASS", "ROOT", "BRANCH", "SEED", "TWIG",
+    "BARK", "FRUIT", "ROSE", "TULIP", "DAISY", "LILY", "PETAL", "EARTH", "FIELD", "JUNGLE",
+    "CAVE", "CLIFF", "RAINBOW", "FROST", "SUMMER", "WINTER", "SPRING", "AUTUMN", "NIGHT", "DAY"
+  ],
+  "Home": [
+    "HOUSE", "HOME", "ROOM", "DOOR", "WALL", "ROOF", "FLOOR", "GATE", "KEY", "BELL",
+    "LAMP", "LIGHT", "BED", "PILLOW", "BLANKET", "SHEET", "SOFA", "CHAIR", "TABLE", "DESK",
+    "COUCH", "SHELF", "CLOSET", "DRAWER", "MIRROR", "CARPET", "RUG", "CURTAIN", "WINDOW", "KITCHEN",
+    "STOVE", "OVEN", "FRIDGE", "SINK", "PLATE", "CUP", "MUG", "BOWL", "SPOON", "FORK",
+    "KNIFE", "GLASS", "NAPKIN", "KETTLE", "TEAPOT", "POT", "PAN", "TOWEL", "BRUSH", "COMB"
+  ],
+  "School & Toys": [
+    "BOOK", "PEN", "PAGE", "PENCIL", "PAPER", "RULER", "ERASER", "BAG", "CLASS", "TEACHER",
+    "PUPIL", "STUDENT", "LESSON", "GLUE", "TAPE", "CRAYON", "MARKER", "FOLDER", "BOARD", "CHALK",
+    "PAINT", "NOTE", "EXAM", "TEST", "GRADE", "BALL", "KITE", "DOLL", "BLOCK", "PUZZLE",
+    "GAME", "TRAIN", "ROBOT", "TEDDY", "DRUM", "MARBLE", "ROPE", "SWING", "SLIDE", "PUPPET",
+    "BUBBLE", "CASTLE", "TOY", "DICE", "CARDS", "LEGO", "MAGIC", "CLOWN", "FUN", "PLAY"
+  ],
+  "Vehicles": [
+    "CAR", "BUS", "VAN", "CAB", "JET", "TRAM", "RAFT", "SAIL", "JEEP", "BOAT",
+    "SHIP", "TAXI", "BIKE", "TRUCK", "PLANE", "METRO", "MOPED", "BUGGY", "WAGON", "CANOE",
+    "KAYAK", "YACHT", "SKATE", "MOTOR", "FERRY", "SLED", "ROCKET", "SUBWAY", "CARGO", "GLIDER",
+    "CAMPER", "ENGINE", "TRACTOR", "SCOOTER", "CHOPPER", "CHARIOT", "TRAILER", "CART", "CRUISER", "RAILWAY"
+  ],
+  "Actions": [
+    "RUN", "JUMP", "WALK", "HOP", "SKIP", "SWIM", "FLY", "DANCE", "PLAY", "SING",
+    "READ", "WRITE", "EAT", "DRINK", "SLEEP", "WAKE", "COOK", "BAKE", "WASH", "CLEAN",
+    "HUG", "KISS", "LOVE", "LIKE", "LAUGH", "CRY", "SMILE", "FROWN", "TALK", "SAY",
+    "ASK", "TELL", "LISTEN", "SEE", "LOOK", "WATCH", "FIND", "LOSE", "OPEN", "CLOSE",
+    "PUSH", "PULL", "LIFT", "CARRY", "GIVE", "TAKE", "MAKE", "HELP", "SHARE", "BUILD",
+    "BREAK", "FIX", "DRAW", "CUT", "SIT", "STAND", "STOP", "START", "COME", "BRING"
+  ]
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Word Search" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/icon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+    <title>Word Search</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div class="top-bar">
+        <div class="level-toggle">
+          <button class="level-btn active" data-level="beginner" aria-label="Beginner mode">B</button>
+          <button class="level-btn" data-level="advanced" aria-label="Advanced mode">A</button>
+        </div>
+        <button class="icon-btn pause-btn" id="pauseBtn" aria-label="Pause">
+          <svg class="icon-pause" viewBox="0 0 36 36" width="34" height="34" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="pause-g" cx="38%" cy="32%" r="62%">
+                <stop offset="0%" stop-color="#818cf8"/>
+                <stop offset="100%" stop-color="#3730a3"/>
+              </radialGradient>
+            </defs>
+            <circle cx="18" cy="18" r="17" fill="url(#pause-g)"/>
+            <circle cx="18" cy="18" r="16.5" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <rect x="10" y="10.5" width="5.5" height="15" rx="2.5" fill="rgba(255,255,255,0.95)"/>
+            <rect x="20.5" y="10.5" width="5.5" height="15" rx="2.5" fill="rgba(255,255,255,0.95)"/>
+          </svg>
+          <svg class="icon-play" viewBox="0 0 36 36" width="34" height="34" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="play-g" cx="38%" cy="32%" r="62%">
+                <stop offset="0%" stop-color="#818cf8"/>
+                <stop offset="100%" stop-color="#3730a3"/>
+              </radialGradient>
+            </defs>
+            <circle cx="18" cy="18" r="17" fill="url(#play-g)"/>
+            <circle cx="18" cy="18" r="16.5" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <polygon points="14.5,11 14.5,25 26,18" fill="rgba(255,255,255,0.95)"/>
+          </svg>
+        </button>
+        <span class="theme-display" id="themeDisplay">Word Search</span>
+        <span class="timer-display" id="timerDisplay">0:00</span>
+        <span class="score-display" id="scoreDisplay">⭐ 0</span>
+        <button class="icon-btn" id="newGame" aria-label="New Game" style="font-size: 32px;">🔄</button>
+        <button class="icon-btn" id="statsBtn" aria-label="Stats">
+          <svg viewBox="0 0 24 24" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="stats-g" cx="35%" cy="30%" r="65%">
+                <stop offset="0%" stop-color="#fb923c"/>
+                <stop offset="100%" stop-color="#c2410c"/>
+              </radialGradient>
+              <clipPath id="stats-clip">
+                <circle cx="12" cy="12" r="11.5"/>
+              </clipPath>
+            </defs>
+            <circle cx="12" cy="12" r="12" fill="url(#stats-g)"/>
+            <circle cx="12" cy="12" r="11.5" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <g clip-path="url(#stats-clip)">
+              <rect x="4" y="15" width="4" height="10" rx="1.5" fill="rgba(255,255,255,0.7)"/>
+              <rect x="10" y="9" width="4" height="16" rx="1.5" fill="rgba(255,255,255,0.95)"/>
+              <rect x="16" y="5" width="4" height="20" rx="1.5" fill="rgba(255,255,255,0.85)"/>
+            </g>
+          </svg>
+        </button>
+      </div>
+      <aside class="word-list-panel">
+        <ul id="words"></ul>
+      </aside>
+      <section class="grid" id="grid" aria-label="Word search grid"></section>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

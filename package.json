@@ -1,0 +1,27 @@
+{
+  "name": "word-search",
+  "version": "1.0.0",
+  "description": "A touch-friendly word search game for iPad, featuring themed puzzles, age-aware rewards, and cumulative scoring.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "word-search",
+    "game",
+    "puzzle",
+    "ipad"
+  ],
+  "author": "Vic Lee <liwei.saif@gmail.com>",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "vite": "^8.0.10"
+  },
+  "devDependencies": {
+    "vite-plugin-pwa": "^1.2.0"
+  }
+}
