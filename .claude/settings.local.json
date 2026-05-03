@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem D:\\\\MyProjects\\\\word-search -Exclude node_modules | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem D:\\\\MyProjects\\\\word-search\\\\.claude -Recurse | ForEach-Object { $_.FullName })",
+      "PowerShell(Test-Path D:\\\\MyProjects\\\\word-search\\\\node_modules\\\\vite; if \\(Test-Path D:\\\\MyProjects\\\\word-search\\\\node_modules\\\\vite\\\\package.json\\) { \\(Get-Content D:\\\\MyProjects\\\\word-search\\\\node_modules\\\\vite\\\\package.json | ConvertFrom-Json\\).version })",
+      "Bash(Get-ChildItem -Path \"D:\\\\MyProjects\\\\word-search\" -File -Depth 0)",
+      "Bash(Select-Object Name)",
+      "PowerShell(Get-ChildItem D:\\\\MyProjects\\\\word-search | Where-Object { $_.Name -ne 'node_modules' } | Select-Object Name, Mode)",
+      "PowerShell(Get-ChildItem D:\\\\MyProjects\\\\word-search -Force | Where-Object { $_.Name -ne 'node_modules' } | Format-Table Name, Mode, Length)"
+    ]
+  }
+}
