@@ -6,12 +6,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Word Search" />
+    <meta name="description" content="A touch-friendly word search puzzle game by Vic Lee" />
     <link rel="icon" href="/word-search/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/word-search/icon.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/word-search/apple-touch-icon-180x180.png" />
     <title>Word Search</title>
-    <script type="module" crossorigin src="/word-search/assets/index-DmlJIU0l.js"></script>
-    <link rel="stylesheet" crossorigin href="/word-search/assets/index-CEW7rDKH.css">
+    <script type="module" crossorigin src="/word-search/assets/index-DnJft3MU.js"></script>
+    <link rel="stylesheet" crossorigin href="/word-search/assets/index-CJDPVSMQ.css">
   <link rel="manifest" href="/word-search/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/word-search/registerSW.js"></script></head>
   <body>
     <div id="app">
@@ -45,10 +46,9 @@
             <polygon points="14.5,11 14.5,25 26,18" fill="rgba(255,255,255,0.95)"/>
           </svg>
         </button>
-        <span class="theme-display" id="themeDisplay">Word Search</span>
         <span class="timer-display" id="timerDisplay">0:00</span>
         <span class="score-display" id="scoreDisplay">⭐ 0</span>
-        <button class="icon-btn" id="newGame" aria-label="New Game" style="font-size: 32px;">🔄</button>
+        <button class="icon-btn" id="newGame" aria-label="New Game">🔄</button>
         <button class="icon-btn" id="statsBtn" aria-label="Stats">
           <svg viewBox="0 0 24 24" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -70,6 +70,7 @@
           </svg>
         </button>
       </div>
+      <h1 class="theme-display" id="themeDisplay">Word Search</h1>
       <aside class="word-list-panel">
         <ul id="words"></ul>
       </aside>
