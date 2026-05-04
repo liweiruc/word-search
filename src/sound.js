@@ -15,6 +15,8 @@ function getContext() {
   return _ctx;
 }
 
+let _bgmPending = false;
+
 export function resume() {
   const ctx = getContext();
   if (ctx && ctx.state === 'suspended') ctx.resume();
