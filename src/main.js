@@ -2,6 +2,7 @@ import { startNewGame } from './logic.js';
 import { renderGrid, renderWordList, setFound, markFoundCells, showCongrats, showStats } from './view.js';
 import { loadStats, saveGameResult, calcWordScore } from './scores.js';
 import { LEVELS } from './config.js';
+import * as sound from './sound.js';
 
 let currentLevel = 'beginner';
 let paused = false;
@@ -21,6 +22,8 @@ const scoreEl       = document.getElementById('scoreDisplay');
 const newGameBtn    = document.getElementById('newGame');
 const statsBtnEl    = document.getElementById('statsBtn');
 const pauseBtnEl    = document.getElementById('pauseBtn');
+const muteBtnEl     = document.getElementById('muteBtn');
+const bgmBtnEl      = document.getElementById('bgmBtn');
 const levelBtns     = document.querySelectorAll('.level-btn');
 
 function formatTime(secs) {
@@ -39,7 +42,10 @@ function startTimer() {
   gridEl.classList.remove('paused');
   timerEl.textContent = '0:00';
   state.timerInterval = setInterval(() => {
-    timerEl.textContent = formatTime((Date.now() - state.startTime) / 1000);
+    const elapsed = (Date.now() - state.startTime) / 1000;
+    timerEl.textContent = formatTime(elapsed);
+    const remaining = (LEVELS[currentLevel]?.gold ?? Infinity) - elapsed;
+    if (remaining > 0 && remaining <= 10) sound.playTimerTick();
   }, 1000);
 }
 
@@ -51,20 +57,28 @@ function stopTimer() {
 
 function togglePause() {
   if (state.words.length === 0) return;
+  sound.resume();
   paused = !paused;
   pauseBtnEl.classList.toggle('is-paused', paused);
   gridEl.classList.toggle('paused', paused);
   if (paused) {
+    sound.playPause();
+    sound.pauseBGM();
     state.elapsedAtPause += (Date.now() - state.startTime) / 1000;
     state.pauseStart = Date.now();
     clearInterval(state.timerInterval);
     state.timerInterval = null;
   } else {
+    sound.playResume();
+    sound.resumeBGM();
     const pauseMs = Date.now() - state.pauseStart;
     state.lastFindTime += pauseMs;
     state.startTime = Date.now();
     state.timerInterval = setInterval(() => {
-      timerEl.textContent = formatTime(state.elapsedAtPause + (Date.now() - state.startTime) / 1000);
+      const elapsed = state.elapsedAtPause + (Date.now() - state.startTime) / 1000;
+      timerEl.textContent = formatTime(elapsed);
+      const remaining = (LEVELS[currentLevel]?.gold ?? Infinity) - elapsed;
+      if (remaining > 0 && remaining <= 10) sound.playTimerTick();
     }, 1000);
   }
 }
@@ -88,9 +102,14 @@ function newGame(level) {
   renderGrid(gridEl, letters);
   renderWordList(wordListEl, words);
   startTimer();
+  sound.resume();
+  sound.playNewGame();
+  sound.startBGM();
 }
 
 function onWordFound(word, color) {
+  sound.resume();
+  sound.playWordFound();
   state.found.push(word);
 
   const secondsSinceLast = (Date.now() - state.lastFindTime) / 1000;
@@ -102,10 +121,12 @@ function onWordFound(word, color) {
   setFound(wordListEl, word, color, currentLevel);
 
   if (state.found.length === state.words.length) {
+    sound.stopBGM();
     const elapsedSeconds = stopTimer();
     timerEl.textContent = formatTime(elapsedSeconds);
     const stars = computeStars(currentLevel, elapsedSeconds);
     const savedStats = saveGameResult({ level: currentLevel, elapsedSeconds, score: state.currentScore, stars });
+    setTimeout(() => sound.playGameComplete(), 400);
     setTimeout(() => showCongrats(
       () => newGame(currentLevel),
       { level: currentLevel, elapsedSeconds, score: state.currentScore, stars, savedStats }
@@ -118,7 +139,11 @@ gridEl.addEventListener('cellselect', (e) => {
   const rev = word.split('').reverse().join('');
   if (!word) return;
   const match = state.words.includes(word) ? word : state.words.includes(rev) ? rev : null;
-  if (!match || state.found.includes(match)) return;
+  if (!match || state.found.includes(match)) {
+    sound.resume();
+    sound.playInvalid();
+    return;
+  }
   const color = markFoundCells(cells);
   onWordFound(match, color);
 });
@@ -134,7 +159,22 @@ levelBtns.forEach((btn) => {
 });
 
 newGameBtn.addEventListener('click', () => newGame(currentLevel));
-statsBtnEl.addEventListener('click', () => showStats(loadStats()));
+statsBtnEl.addEventListener('click', () => {
+  sound.resume();
+  sound.playButtonClick();
+  showStats(loadStats());
+});
 pauseBtnEl.addEventListener('click', togglePause);
+muteBtnEl.addEventListener('click', () => {
+  sound.toggleMute();
+  muteBtnEl.classList.toggle('is-muted', sound.isMuted());
+});
+bgmBtnEl.addEventListener('click', () => {
+  sound.resume();
+  sound.toggleBGM();
+  bgmBtnEl.classList.toggle('is-off', !sound.isBGMOn());
+});
 
+muteBtnEl.classList.toggle('is-muted', sound.isMuted());
+bgmBtnEl.classList.toggle('is-off', !sound.isBGMOn());
 newGame(currentLevel);

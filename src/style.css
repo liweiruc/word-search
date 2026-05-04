@@ -134,6 +134,14 @@ html, body {
 .pause-btn.is-paused .icon-pause { display: none; }
 .pause-btn.is-paused .icon-play  { display: flex; }
 
+.mute-btn .icon-muted { display: none; }
+.mute-btn.is-muted .icon-unmuted { display: none; }
+.mute-btn.is-muted .icon-muted { display: inline; }
+
+.bgm-btn .icon-bgm-off { display: none; }
+.bgm-btn.is-off .icon-bgm-on { display: none; }
+.bgm-btn.is-off .icon-bgm-off { display: inline; }
+
 .theme-display {
   display: block;
   text-align: center;

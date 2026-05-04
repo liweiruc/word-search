@@ -1,10 +1,14 @@
 import { FOUND_COLORS, CONFETTI_COLORS, STATS_CARD_BGS } from './constants.js';
+import * as sound from './sound.js';
 
 let selecting = false;
 let firstCell = null;
 let lineCells = [];
 let foundColorIdx = 0;
 let activeGrid = null;
+let _noteIndex = 0;       // position in C-major scale, persists across brief lifts
+let _prevLen = 0;         // previous lineCells.length, resets each onStart
+let _soundResetTimer = null;
 
 function getCellEls(grid) {
   return Array.from(grid.querySelectorAll('.cell'));
@@ -14,6 +18,9 @@ export function renderGrid(container, letters) {
   selecting = false;
   firstCell = null;
   activeGrid = container;
+  _noteIndex = 0;
+  _prevLen = 0;
+  if (_soundResetTimer) { clearTimeout(_soundResetTimer); _soundResetTimer = null; }
   clearLine();
   const cols = letters[0].length;
   container.style.setProperty('--cols', cols);
@@ -147,11 +154,29 @@ function bindEvents(grid) {
 
 function onStart(e) {
   e.preventDefault();
+  sound.resume();
+  if (_soundResetTimer) {
+    // Brief lift — maintain continuity, don't reset note sequence
+    clearTimeout(_soundResetTimer);
+    _soundResetTimer = null;
+  } else {
+    _noteIndex = 0; // New drag, start from do
+  }
   selecting = true;
+  _prevLen = 0;
   clearLine();
   const cell = e.target.closest('.cell');
-  if (!cell) return;
+  if (!cell) {
+    _noteIndex = 0;
+    return;
+  }
   firstCell = cell;
+  // Play do immediately on first touch of a new drag
+  if (_noteIndex === 0) {
+    sound.playCellSelect(0);
+    _noteIndex = 1;
+    _prevLen = 1; // prevent onMove from re-playing the first cell
+  }
 }
 
 function cellFromPoint(x, y) {
@@ -177,18 +202,30 @@ function onMove(e) {
     clearLine();
     lineCells = [firstCell];
     highlightSelection(lineCells);
+    while (_prevLen < lineCells.length) {
+      sound.playCellSelect(_noteIndex);
+      _noteIndex++;
+      _prevLen++;
+    }
     return;
   }
 
   const dir = snapDir(dr, dc);
-  clearLine();
-  lineCells = traceLine(firstCell.parentElement, firstCell, dir);
-  const idx = lineCells.findIndex(
+  const fullLine = traceLine(firstCell.parentElement, firstCell, dir);
+  const idx = fullLine.findIndex(
     (c) => c.dataset.row === el.dataset.row && c.dataset.col === el.dataset.col,
   );
-  if (idx >= 0) lineCells = lineCells.slice(0, idx + 1);
+  // Current cell must lie on the snapped line — otherwise skip
+  if (idx < 0) return;
 
+  clearLine();
+  lineCells = fullLine.slice(0, idx + 1);
   highlightSelection(lineCells);
+  while (_prevLen < lineCells.length) {
+    sound.playCellSelect(_noteIndex);
+    _noteIndex++;
+    _prevLen++;
+  }
 }
 
 function fmtTime(secs) {
@@ -318,13 +355,23 @@ function onEnd() {
   if (lineCells.length < 2) {
     clearLine();
     firstCell = null;
+    // Brief lift with no selection — wait 300ms before resetting sound
+    if (_soundResetTimer) clearTimeout(_soundResetTimer);
+    _soundResetTimer = setTimeout(() => { _noteIndex = 0; }, 300);
     return;
   }
   const word = lineCells.map((c) => c.textContent).join('');
   const cells = [...lineCells];
-  firstCell.parentElement.dispatchEvent(
-    new CustomEvent('cellselect', { detail: { word, cells } }),
-  );
+  const grid = firstCell.parentElement;
   clearLine();
   firstCell = null;
+  // Delay submission 300ms — if user touches down again, cancel and continue
+  if (_soundResetTimer) clearTimeout(_soundResetTimer);
+  _soundResetTimer = setTimeout(() => {
+    grid.dispatchEvent(
+      new CustomEvent('cellselect', { detail: { word, cells } }),
+    );
+    _noteIndex = 0;
+    _soundResetTimer = null;
+  }, 300);
 }
