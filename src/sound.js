@@ -15,16 +15,17 @@ function getContext() {
   return _ctx;
 }
 
-let _bgmPending = false;
-
 export function resume() {
   const ctx = getContext();
   if (ctx && ctx.state === 'suspended') ctx.resume();
-  // Retry BGM that was blocked by iOS autoplay policy
-  if (_bgmPending && !_muted && _bgmOn) {
+  // Once AudioContext is running, start deferred BGM
+  if (_bgmPending && ctx && ctx.state === 'running' && !_muted && _bgmOn) {
     _bgmPending = false;
-    const audio = _getBGM();
-    audio.play().catch(() => { _bgmPending = true; });
+    _startBGMNode();
+  }
+  // If BGM was paused (source stopped) but should be playing, restart it
+  if (_bgmStarted && !_muted && _bgmOn && ctx && ctx.state === 'running' && !_bgmSource) {
+    _startBGMNode();
   }
 }
 
@@ -36,9 +37,10 @@ export function toggleMute() {
   _muted = !_muted;
   try { localStorage.setItem('ws_sound_muted', _muted ? '1' : '0'); } catch (_) {}
   if (_muted) {
-    if (_bgmAudio) _bgmAudio.pause();
-  } else if (_bgmOn) {
-    startBGM();
+    if (_bgmGain) _bgmGain.gain.value = 0;
+  } else {
+    if (_bgmGain) _bgmGain.gain.value = 0.12;
+    else if (_bgmOn) startBGM();
   }
 }
 
@@ -190,22 +192,62 @@ export function playTimerTick() {
   playTone(1000, 0.02, 'triangle', 0.02, 0);
 }
 
-// ── Background Music ──────────────────────────────────────────────
+// ── Background Music (Web Audio API) ──────────────────────────────
 
 let _bgmOn = true;
-let _bgmAudio = null;
+let _bgmStarted = false;
+let _bgmBuffer = null;
+let _bgmSource = null;
+let _bgmGain = null;
+let _bgmLoading = false;
 
 try {
   _bgmOn = localStorage.getItem('ws_bgm_on') !== '0';
 } catch (_) {}
 
-function _getBGM() {
-  if (!_bgmAudio) {
-    _bgmAudio = new Audio(import.meta.env.BASE_URL + 'clavier-music-passacaglia-204294.mp3');
-    _bgmAudio.loop = true;
-    _bgmAudio.volume = 0.12; // lower than selection SFX (0.35)
+async function _loadBGMBuffer() {
+  if (_bgmBuffer) return _bgmBuffer;
+  if (_bgmLoading) return null;
+  _bgmLoading = true;
+  try {
+    const ctx = getContext();
+    if (!ctx) return null;
+    const resp = await fetch(import.meta.env.BASE_URL + 'clavier-music-passacaglia-204294.mp3');
+    if (!resp.ok) throw new Error('BGM fetch failed');
+    const arrayBuf = await resp.arrayBuffer();
+    _bgmBuffer = await ctx.decodeAudioData(arrayBuf);
+    return _bgmBuffer;
+  } catch (_) {
+    return null;
+  } finally {
+    _bgmLoading = false;
   }
-  return _bgmAudio;
+}
+
+function _startBGMNode() {
+  const ctx = getContext();
+  if (!ctx || !_bgmBuffer || ctx.state !== 'running') return;
+
+  // Stop any existing source
+  if (_bgmSource) {
+    try { _bgmSource.stop(); } catch (_) {}
+    _bgmSource.disconnect();
+    _bgmSource = null;
+  }
+  if (_bgmGain) {
+    _bgmGain.disconnect();
+    _bgmGain = null;
+  }
+
+  _bgmSource = ctx.createBufferSource();
+  _bgmSource.buffer = _bgmBuffer;
+  _bgmSource.loop = true;
+
+  _bgmGain = ctx.createGain();
+  _bgmGain.gain.value = _muted ? 0 : 0.12;
+
+  _bgmSource.connect(_bgmGain).connect(ctx.destination);
+  _bgmSource.start();
 }
 
 export function isBGMOn() { return _bgmOn; }
@@ -218,30 +260,63 @@ export function toggleBGM() {
 
 export function startBGM() {
   if (_muted || !_bgmOn) return;
-  const audio = _getBGM();
-  if (!audio.paused) return; // already playing
-  const p = audio.play();
-  if (p) p.catch(() => { _bgmPending = true; }); // iOS blocks autoplay — retry on user gesture
+  if (_bgmStarted && _bgmSource) return; // already playing
+
+  _bgmStarted = true;
+  _bgmPending = false;
+
+  const ctx = getContext();
+  if (!ctx) return;
+
+  // If AudioContext isn't running yet, defer until resume()
+  if (ctx.state !== 'running') {
+    _bgmPending = true;
+    _loadBGMBuffer(); // preload the buffer while waiting
+    return;
+  }
+
+  // Load buffer and start
+  _loadBGMBuffer().then(buf => {
+    if (buf && _bgmStarted && !_muted && _bgmOn) {
+      _startBGMNode();
+    }
+  }).catch(() => {
+    _bgmPending = true;
+  });
 }
 
 export function stopBGM() {
+  _bgmStarted = false;
   _bgmPending = false;
-  if (_bgmAudio) {
-    _bgmAudio.pause();
-    _bgmAudio.currentTime = 0;
+  if (_bgmSource) {
+    try { _bgmSource.stop(); } catch (_) {}
+    _bgmSource.disconnect();
+    _bgmSource = null;
+  }
+  if (_bgmGain) {
+    _bgmGain.disconnect();
+    _bgmGain = null;
   }
 }
 
 export function pauseBGM() {
-  if (_bgmAudio) _bgmAudio.pause();
+  // Disconnect gain to silence without destroying the source
+  if (_bgmGain) {
+    _bgmGain.disconnect();
+    _bgmGain = null;
+  }
+  if (_bgmSource) {
+    try { _bgmSource.stop(); } catch (_) {}
+    _bgmSource.disconnect();
+    _bgmSource = null;
+  }
 }
 
 export function resumeBGM() {
-  if (_muted || !_bgmOn) return;
+  if (_muted || !_bgmOn || !_bgmStarted) return;
   _bgmPending = false;
-  const audio = _getBGM();
-  if (audio.paused) {
-    const p = audio.play();
-    if (p) p.catch(() => { _bgmPending = true; });
+  const ctx = getContext();
+  if (ctx && ctx.state === 'running' && _bgmBuffer) {
+    _startBGMNode();
   }
 }
