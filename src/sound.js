@@ -15,9 +15,17 @@ function getContext() {
   return _ctx;
 }
 
+let _bgmPending = false;
+
 export function resume() {
   const ctx = getContext();
   if (ctx && ctx.state === 'suspended') ctx.resume();
+  // Retry BGM that was blocked by iOS autoplay policy
+  if (_bgmPending && !_muted && _bgmOn) {
+    _bgmPending = false;
+    const audio = _getBGM();
+    audio.play().catch(() => { _bgmPending = true; });
+  }
 }
 
 export function isMuted() {
@@ -212,10 +220,12 @@ export function startBGM() {
   if (_muted || !_bgmOn) return;
   const audio = _getBGM();
   if (!audio.paused) return; // already playing
-  audio.play().catch(() => {}); // ignore autoplay errors until user interacts
+  const p = audio.play();
+  if (p) p.catch(() => { _bgmPending = true; }); // iOS blocks autoplay — retry on user gesture
 }
 
 export function stopBGM() {
+  _bgmPending = false;
   if (_bgmAudio) {
     _bgmAudio.pause();
     _bgmAudio.currentTime = 0;
@@ -228,6 +238,10 @@ export function pauseBGM() {
 
 export function resumeBGM() {
   if (_muted || !_bgmOn) return;
+  _bgmPending = false;
   const audio = _getBGM();
-  if (audio.paused) audio.play().catch(() => {});
+  if (audio.paused) {
+    const p = audio.play();
+    if (p) p.catch(() => { _bgmPending = true; });
+  }
 }
